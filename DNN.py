@@ -17,6 +17,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 from keras.optimizers import Adam
 
+
 batch_size = 32
 num_classes = 100
 epochs = 30
@@ -24,9 +25,7 @@ epochs = 30
 # input image dimensions
 img_rows, img_cols = 28, 28
 
-# the data, split between train and test sets
-#(x_train, y_train), (x_test, y_test) = mnist.load_data()
-
+#Extracting paths of all images in dataset along with labels
 dir = '/home/vishalmn/Omnamahshivaay/IMFDB_final'                                                                                                                                                                                                          
 images = []
 labels = []
@@ -42,6 +41,7 @@ for root, dirs, files in os.walk(dir):
             
 image_dataset = []
 
+#Loading images from the dataset
 for image in images:
     img = cv2.imread(image)
     img = cv2.resize(img, (img_rows, img_cols))
@@ -52,10 +52,12 @@ for image in images:
     image_dataset.append(img)
 print("Successfully read images")
 
+#Shuffling the dataset
 combine = list(zip(image_dataset,labels))
 random.shuffle(combine)
 image_dataset[:],labels[:] = zip(*combine)
 
+#Converting list to numpy array for feeding into model 
 image_dataset = np.array(image_dataset, dtype="float") / 255.0
 labels = np.array(labels)
 
@@ -83,45 +85,47 @@ else:
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
 
-print('x_train shape : ', x_train.shape)
-print(x_train.shape[0], ' train samples')
-print(x_test.shape[0], ' test samples')
-
-
+#Creating model and stacking up layers
 model = Sequential()
+#Layer 1, ie input layer
 model.add(Conv2D(32, kernel_size=(3, 3),activation='relu',input_shape=input_shape))
 model.add(BatchNormalization(axis=-1))
-
+#Layer 2
 model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(BatchNormalization(axis=-1))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
-
+#Layer 3
 model.add(Conv2D(256, (3, 3), activation='relu'))
 model.add(BatchNormalization(axis=-1))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
-
+#Layer 4
 model.add(Conv2D(256, (3, 3), activation='relu'))
 model.add(BatchNormalization(axis=-1))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 model.add(Flatten())
-
+#Layer 5
 model.add(Dense(256, activation='relu'))
 model.add(BatchNormalization(axis=-1))
 model.add(Dropout(0.5))
+#Layer 6, ie output layer
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer='adam',
               metrics=['accuracy'])
 
+#Execution
 model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
           validation_data=(x_test, y_test))
 score = model.evaluate(x_test, y_test, verbose=0)
+
+#Final results
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
