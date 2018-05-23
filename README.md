@@ -1,5 +1,5 @@
-# Image-classification
-Image classification with Keras using Deep Neural Networks.
+# Image-Classification
+Image Classification With Deep Convolutional Neural Networks Using Keras.
 
 Introduction
 
